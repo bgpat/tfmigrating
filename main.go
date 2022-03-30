@@ -77,9 +77,32 @@ func eq(c, d *tfjson.ResourceChange) bool {
 	before := d.Change.Before.(map[string]interface{})
 	after := c.Change.After.(map[string]interface{})
 	for k, a := range after {
-		if b, ok := before[k]; ok && !reflect.DeepEqual(b, a) {
+		b, ok := before[k]
+		if !ok {
 			return false
 		}
+		if reflect.DeepEqual(b, a) {
+			continue
+		}
+		if isZero(b) && isZero(a) {
+			continue
+		}
+		return false
 	}
 	return true
+}
+
+func isZero(i interface{}) bool {
+	if i == nil {
+		return true
+	}
+	v := reflect.ValueOf(i)
+	if v.IsZero() {
+		return true
+	}
+	kind := v.Kind()
+	if kind == reflect.Array || kind == reflect.Slice || kind == reflect.Map {
+		return v.Len() == 0
+	}
+	return false
 }
