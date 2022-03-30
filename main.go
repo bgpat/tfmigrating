@@ -77,9 +77,9 @@ func eq(c, d *tfjson.ResourceChange) bool {
 	before := d.Change.Before.(map[string]interface{})
 	after := c.Change.After.(map[string]interface{})
 	for k, a := range after {
-		if b, ok := before[k]; ok && reflect.DeepEqual(b, a) {
-			return true
+		if b, ok := before[k]; ok && !reflect.DeepEqual(b, a) {
+			return false
 		}
 	}
-	return false
+	return true
 }
